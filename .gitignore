@@ -1,0 +1,13 @@
+/.idea/
+/.vscode/
+/*.iml
+.DS_Store
+
+/.ipynb_checkpoints/
+/target/
+*.npz
+*.h5
+
+config.json
+metadata.json
+*.keras
