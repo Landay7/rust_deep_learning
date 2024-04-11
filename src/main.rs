@@ -11,7 +11,8 @@ enum MainError {
     Hdf5OpenError(String),
     ConfigParseError(serde_json::Error),
     ModelBuildError(String),
-    NpzReadError(std::io::Error),
+    FileReadError(std::io::Error),
+    NpzReadError(ndarray_npy::ReadNpzError),
     NpzMissingFileError(ndarray_npy::ReadNpzError),
     ModelComputeError(String),
     ArrayTransformError(String),
@@ -22,7 +23,7 @@ fn main() -> Result<(), MainError> {
         .map_err(|err| MainError::Hdf5OpenError(format!("Failed to open HDF5 file: {}", err)))?;
     let deserialized: Config = serde_json::from_str(
         fs::read_to_string("config.json")
-            .map_err(MainError::NpzReadError)?
+            .map_err(MainError::FileReadError)?
             .as_str(),
     )
     .map_err(MainError::ConfigParseError)?;
@@ -30,7 +31,7 @@ fn main() -> Result<(), MainError> {
         MainError::ModelBuildError(format!("Can't build the model from hdf5: {:?}", err))
     })?;
     let mut npz =
-        NpzReader::new(File::open("test_data.npz").map_err(MainError::NpzReadError)?).unwrap();
+        NpzReader::new(File::open("test_data.npz").map_err(MainError::FileReadError)?).map_err(MainError::NpzReadError)?;
     let x: Array4<f32> = npz
         .by_name("X.npy")
         .map_err(MainError::NpzMissingFileError)?;
