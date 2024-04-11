@@ -2,7 +2,7 @@
 use crate::{NArray, Matrix, Vector};
 
 pub trait Layer {
-    fn compute(&self, incoming: NArray) -> NArray;
+    fn compute(&self, incoming: NArray) -> Result<NArray, ndarray::ShapeError>;
     
     fn get_mut_weights(&mut self) -> &mut Matrix {
         panic!("this layer is not trainable")

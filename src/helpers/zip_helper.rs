@@ -2,14 +2,6 @@
 
 use std::io::prelude::*;
 
-fn get_file_as_byte_vec(filename: &String) -> Vec<u8> {
-    let mut f = File::open(filename).expect("no file found");
-    let metadata = fs::metadata(filename).expect("unable to read metadata");
-    let mut buffer = vec![0; metadata.len() as usize];
-    f.read(&mut buffer).expect("buffer overflow");
-    buffer
-}
-
 fn list_zip_contents(reader: impl Read + Seek) -> zip::result::ZipResult<()> {
     let mut zip = zip::ZipArchive::new(reader)?;
 

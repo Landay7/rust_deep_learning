@@ -1,11 +1,17 @@
 use crate::{activations::functions::{relu_activation, sigmoid_activation, softmax_activation}, layers::layer_trait::Layer};
 use crate::NArray;
+use serde::Deserialize;
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Deserialize)]
 pub enum ActivationFunction {
+    #[serde(alias = "sigmoid")]
     Sigmoid,
+    #[serde(alias = "relu")]
     ReLu,
+    #[serde(alias = "softmax")]
     SoftMax,
+    #[serde(alias = "linear")]
     Linear
 }
 
@@ -28,35 +34,21 @@ impl ActivationFunction {
     }
 }
 
-impl Into<ActivationFunction> for String{
-    fn into(self) -> ActivationFunction {
-        match self.as_str() {
-            "relu" => ActivationFunction::ReLu,
-            "sigmoid" => ActivationFunction::Sigmoid,
-            "softmax" => ActivationFunction::SoftMax,
-            "linear" => ActivationFunction::Linear,
-            _ => panic!("Unimplemented Activation function {}", self)
-        }
-    }
-}
-
 pub struct Activation {
-    pub threshold: f64,
-    pub activation_function: ActivationFunction
+    activation_function: ActivationFunction
 }
 
 impl Activation{
-    pub fn new(threshold: f64, activation_function: ActivationFunction) -> Self{
+    pub fn new(activation_function: ActivationFunction) -> Self{
         Self {
-            threshold,
             activation_function
         }
     }
 }
 
 impl Layer for Activation {
-    fn compute(&self, incoming: NArray) -> NArray {
-        self.activation_function.compute(incoming)
+    fn compute(&self, incoming: NArray) -> Result<NArray, ndarray::ShapeError> {
+        Ok(self.activation_function.compute(incoming))
     }
 }
 
@@ -69,11 +61,11 @@ mod tests {
 
     #[test]
     fn test_relu_activation() {
-        let relu_activation = Activation::new(0.0, ActivationFunction::ReLu);
+        let relu_activation = Activation::new(ActivationFunction::ReLu);
 
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![-1.0, 0.0, 1.0]).unwrap();
         let expected_output = Vector::from_vec(vec![0.0, 0.0, 1.0]);
-        let output = relu_activation.compute(input);
+        let output = relu_activation.compute(input).unwrap();
         let output_vector = Vector::from_vec(output.as_slice().unwrap().to_vec());
         for (actual, expected) in output_vector.iter().zip(expected_output.iter()) {
             assert_approx_eq!(actual, expected, 1e-6);
@@ -82,12 +74,12 @@ mod tests {
 
     #[test]
     fn test_sigmoid_activation() {
-        let sigmoid_activation = Activation::new(0.0, ActivationFunction::Sigmoid);
+        let sigmoid_activation = Activation::new( ActivationFunction::Sigmoid);
 
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![0.0, 1.0, -1.0]).unwrap();
         let expected_output = Vector::from(vec![0.5, 0.7310586, 0.26894143]);
         
-        let output = sigmoid_activation.compute(input);
+        let output = sigmoid_activation.compute(input).unwrap();
         let output_vector = Vector::from_vec(output.as_slice().unwrap().to_vec());
         for (actual, expected) in output_vector.iter().zip(expected_output.iter()) {
             assert_approx_eq!(actual, expected, 1e-6);
@@ -96,12 +88,12 @@ mod tests {
 
     #[test]
     fn test_softmax_activation() {
-        let softmax_activation = Activation::new(0.0, ActivationFunction::SoftMax);
+        let softmax_activation = Activation::new( ActivationFunction::SoftMax);
 
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![1.0, 2.0, 3.0]).unwrap();
         let expected_output = Vector::from(vec![0.09003057, 0.24472848, 0.66524094]);
         
-        let output = softmax_activation.compute(input);
+        let output = softmax_activation.compute(input).unwrap();
         let output_vector = Vector::from_vec(output.as_slice().unwrap().to_vec());
         for (actual, expected) in output_vector.iter().zip(expected_output.iter()) {
             assert_approx_eq!(actual, expected, 1e-6);
@@ -110,12 +102,12 @@ mod tests {
 
     #[test]
     fn test_linear_activation() {
-        let linear_activation = Activation::new(0.0, ActivationFunction::Linear);
+        let linear_activation = Activation::new( ActivationFunction::Linear);
 
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![1.0, 2.0, 3.0]).unwrap();
         let expected_output = Vector::from(vec![1.0, 2.0, 3.0]);
         
-        let output = linear_activation.compute(input);
+        let output = linear_activation.compute(input).unwrap();
         let output_vector = Vector::from_vec(output.as_slice().unwrap().to_vec());
         for (actual, expected) in output_vector.iter().zip(expected_output.iter()) {
             assert_approx_eq!(actual, expected, 1e-6);

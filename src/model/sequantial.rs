@@ -1,4 +1,4 @@
-use crate::configuration::config::Config;
+use crate::configuration::{config::Config, layer:: LayerType};
 use crate::layers::dense::Dense;
 use crate::layers::flatten::Flatten;
 use crate::layers::layer_trait::Layer;
@@ -9,33 +9,30 @@ pub struct SequentialModel {
 }
 
 impl SequentialModel {
-    pub fn from_config_and_hdf5(config: Config, file: &hdf5::File) -> Self {
+    pub fn from_config_and_hdf5(config: Config, file: &hdf5::File) -> Result<Self, String> {
         let mut layers = Vec::new();
-        for layer_config in config.config.layers {
-            let layer = match layer_config.class_name.as_str() {
-                "Dense" => {
-                    let activation = layer_config.config["activation"].as_str().map(|val| {
-                        val.to_string().into()
-                    });
-                    Box::new(Dense::from_hdf5(file, layer_config.config["name"].as_str().unwrap(), activation)) as Box<dyn Layer>
+        for layer_config in config.get_layers() {
+            let layer: Box<dyn Layer> = match layer_config.get_class_name() {
+                LayerType::Dense => {
+                    let activation = serde_json::from_value(layer_config.get_property("activation").clone()).map_err(|err| format!("Cant parse activation function {}", err))?;
+                    let layer_name = layer_config.get_property("name").as_str().ok_or(format!("can't find layer name"))?;
+                    let dense = Dense::from_hdf5(file, layer_name, activation).expect(format!("Can't parse dense layer {:?}", layer_config.get_class_name()).as_str());
+                    Box::new(dense)
                 }
-                "Flatten" => {
-                    Box::new(Flatten) as Box<dyn Layer>
+                LayerType::Flatten => {
+                    Box::new(Flatten)
                 }
-                "InputLayer" => { continue; }
-                _ => {
-                    panic!("Unsupported layer type: {}", layer_config.class_name);
-                }
+                LayerType::InputLayer => { continue; }
             };
             layers.push(layer);
         }
-        SequentialModel { layers }
+        Ok(SequentialModel { layers })
     }
 
-    pub fn compute(&self, mut input: NArray) -> NArray {
+    pub fn compute(&self, mut input: NArray) -> Result<NArray, ndarray::ShapeError> {
         for layer in &self.layers {
-            input = layer.compute(input);
+            input = layer.compute(input)?;
         }
-        input
+        Ok(input)
     }
 }

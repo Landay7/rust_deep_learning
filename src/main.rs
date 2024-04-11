@@ -23,21 +23,21 @@ fn argmax(array: &Vector) -> Option<usize> {
     max_index
 }
 
-fn main() {
+fn main() -> std::io::Result<()> {
     let hdf5_file = hdf5::File::open("model.weights.h5").expect("Failed to open HDF5 file");
-    let deserialized: Config = serde_json::from_str(fs::read_to_string("config.json").unwrap().as_str()).unwrap();
-    let model = SequentialModel::from_config_and_hdf5(deserialized, &hdf5_file);
-    let mut npz = NpzReader::new(File::open("test_data.npz").unwrap()).unwrap();
-    let x: Array4<f32> = npz.by_name("X.npy").unwrap();
-    let y: Array1<i64> = npz.by_name("y.npy").unwrap();
+    let deserialized: Config = serde_json::from_str(fs::read_to_string("config.json")?.as_str())?;
+    let model = SequentialModel::from_config_and_hdf5(deserialized, &hdf5_file).expect("Can't build the model from hdf5");
+    let mut npz = NpzReader::new(File::open("test_data.npz")?).expect("Can't read npz archieve");
+    let x: Array4<f32> = npz.by_name("X.npy").expect("There is no X.npy at npz file");
+    let y: Array1<i64> = npz.by_name("y.npy").expect("There is no y.npy at npz file");
     let mut index: usize = 0;
     let mut correct = 0;
     let now = Instant::now();
     for case in x.axis_iter(Axis(0)) {
         // 'case' is now a view of a 3D array representing one case
-        let result_arr = model.compute(case.to_owned().into_dyn());
+        let result_arr = model.compute(case.to_owned().into_dyn()).unwrap();
         let arr_len = result_arr.len();
-        let array1 = result_arr.into_shape(arr_len).unwrap();
+        let array1 = result_arr.into_shape(arr_len).expect("Can't transform the result to 1d array");
 
         // Find the index of the maximum element (argmax)
         let argmax_index = argmax(&array1).unwrap();
@@ -49,5 +49,7 @@ fn main() {
     let elapsed = now.elapsed();
     println!("Elapsed: {:.2?}", elapsed);
     println!("{}", correct / 128);
+
+    Ok(())
 }
 

@@ -18,24 +18,25 @@ impl Dense {
         }
     }
 
-    pub fn from_hdf5(file: &hdf5::File, layer_name: &str, activation: Option<ActivationFunction>) -> Self {
+    pub fn from_hdf5(file: &hdf5::File, layer_name: &str, activation: Option<ActivationFunction>) -> Result<Self, hdf5::Error> {
         let base_path = format!(r"/layers\{}/vars", layer_name);
         dbg!(&base_path);
-        let weights: Matrix = file.dataset(format!("{}/0", base_path).as_str()).unwrap().read_2d().unwrap();
-        let bias: Vector = file.dataset(format!("{}/1", base_path).as_str()).unwrap().read_1d().unwrap();
-        Dense::new(weights, bias, activation)
+        let weights: Matrix = file.dataset(format!("{}/0", base_path).as_str())?.read_2d()?;
+        let bias: Vector = file.dataset(format!("{}/1", base_path).as_str())?.read_1d()?;
+        Ok(Dense::new(weights, bias, activation))
     }
 }
 
 impl Layer for Dense {
-    fn compute(&self, incoming: NArray) -> NArray {
+    fn compute(&self, incoming: NArray) -> Result<NArray, ndarray::ShapeError> {
         let incoming_len = incoming.len();
-        let arr_1d: Vector = incoming.into_shape(incoming_len).unwrap();
+        let arr_1d: Vector = incoming.into_shape(incoming_len)?;
         let computation_result = arr_1d.dot(&self.weights) + self.bias.clone();
         if let Some(activation) = &self.activation {
-            activation.compute(computation_result.into_dimensionality().unwrap())
+            let result_1d = computation_result.into_dimensionality()?;
+            Ok(activation.compute(result_1d))
         } else {
-            computation_result.into_dimensionality().unwrap()
+            computation_result.into_dimensionality()
         }
     }
 
@@ -78,7 +79,7 @@ mod tests {
 
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![1.0, 2.0, 3.0]).unwrap();
 
-        let output = dense_layer.compute(input.clone());
+        let output = dense_layer.compute(input.clone()).unwrap();
         let output_vector = Vector::from_vec(output.as_slice().unwrap().to_vec());
 
         let expected_output = Vector::from_vec(vec![31.0, 38.0, 45.0]);
@@ -96,7 +97,7 @@ mod tests {
 
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![-1.0, 2.0, -3.0]).unwrap();
 
-        let output = dense_layer.compute(input.clone());
+        let output = dense_layer.compute(input.clone()).unwrap();
         let output_vector = Vector::from_vec(output.as_slice().unwrap().to_vec());
 
         let expected_output = Vector::from_vec(vec![0.0, 34.0, 0.0]);

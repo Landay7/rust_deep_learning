@@ -1,61 +1,24 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use crate::configuration::inner_config::InnerConfig;
+use crate::configuration::compile_config::CompileConfig;
+use crate::configuration::layer::Layer;
 use serde_json::Value;
 
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Config {
-    pub module: String,
-    pub class_name: String,
-    pub config: InnerConfig,
-    pub registered_name: Option<String>,
-    pub build_config: Option<HashMap<String, Value>>,
-    pub compile_config: CompileConfig,
+    module: String,
+    class_name: String,
+    config: InnerConfig,
+    registered_name: Option<String>,
+    build_config: Option<HashMap<String, Value>>,
+    compile_config: CompileConfig,
 }
 
-#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct InnerConfig {
-    pub name: String,
-    pub layers: Vec<Layer>,
-}
-
-#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct Layer {
-    pub module: String,
-    pub class_name: String,
-    pub config: HashMap<String, Value>,
-    pub registered_name: Option<String>,
-    pub build_config: Option<HashMap<String, Value>>,
-}
-
-#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct CompileConfig {
-    pub optimizer: Optimizer,
-    pub loss: Loss,
-    pub metrics: Vec<Metric>,
-}
-
-#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct Optimizer {
-    pub module: String,
-    pub class_name: String,
-    pub config: HashMap<String, Value>,
-    pub registered_name: Option<String>,
-}
-
-#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct Loss {
-    pub module: String,
-    pub class_name: String,
-    pub config: HashMap<String, Value>,
-    pub registered_name: Option<String>,
-}
-
-#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct Metric {
-    pub module: String,
-    pub class_name: String,
-    pub config: HashMap<String, Value>,
-    pub registered_name: Option<String>,
+impl Config {
+    pub fn get_layers(&self) -> &Vec<Layer>{
+        &self.config.get_layers()
+    }
 }
 
 
@@ -63,6 +26,10 @@ pub struct Metric {
 mod tests {
     use super::*;
     use serde_json;
+    use crate::configuration::loss::Loss;
+    use crate::configuration::metric::Metric;
+    use crate::configuration::optimizer::Optimizer;
+    use crate::configuration::layer::LayerType;
 
     #[test]
     fn test_serialization_deserialization() {
@@ -92,42 +59,42 @@ mod tests {
         let config = Config {
             module: String::from("keras"),
             class_name: String::from("Sequential"),
-            config: InnerConfig {
-                name: String::from("sequential"),
-                layers: vec![
-                    Layer {
-                        module: String::from("keras.layers"),
-                        class_name: String::from("InputLayer"),
-                        config: input_layer_config,
-                        registered_name: None,
-                        build_config: None,
-                    }
+            config: InnerConfig::new(
+                String::from("sequential"),
+                vec![
+                    Layer::new(
+                        String::from("keras.layers"),
+                        LayerType::InputLayer,
+                        input_layer_config,
+                        None,
+                        None,
+                    )
                 ],
-            },
+            ),
             registered_name: None,
             build_config: None,
-            compile_config: CompileConfig {
-                optimizer: Optimizer {
-                    module: String::from("keras.optimizers"),
-                    class_name: String::from("Adam"),
-                    config: optimizer_config,
-                    registered_name: None,
-                },
-                loss: Loss {
-                    module: String::from("keras.losses"),
-                    class_name: String::from("SparseCategoricalCrossentropy"),
-                    config: loss_config,
-                    registered_name: None,
-                },
-                metrics: vec![
-                    Metric {
-                        module: String::from("keras.metrics"),
-                        class_name: String::from("SparseCategoricalAccuracy"),
-                        config: metric_config,
-                        registered_name: None,
-                    }
+            compile_config: CompileConfig::new(
+                Optimizer::new(
+                    String::from("keras.optimizers"),
+                    String::from("Adam"),
+                    optimizer_config,
+                    None,
+                ),
+                Loss::new(
+                    String::from("keras.losses"),
+                    String::from("SparseCategoricalCrossentropy"),
+                    loss_config,
+                    None,
+                ),
+                vec![
+                    Metric::new(
+                        String::from("keras.metrics"),
+                        String::from("SparseCategoricalAccuracy"),
+                        metric_config,
+                        None,
+                    )
                 ],
-            },
+            ),
         };
 
         let serialized = serde_json::to_string(&config).unwrap();
