@@ -2,7 +2,7 @@ use crate::NArray;
 const E: f32 = std::f32::consts::E;
 
 pub fn softmax_activation(z: NArray) -> NArray {
-    let exp_arr = z.mapv(|x| f32::powf(E, x) );
+    let exp_arr = z.mapv(|x| f32::powf(E, x));
     let sum: f32 = exp_arr.iter().sum();
     exp_arr.mapv(|x| x / sum)
 }
@@ -39,11 +39,7 @@ mod tests {
     fn test_softmax_activation() {
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![1.0, 2.0, 3.0]).unwrap();
 
-        let expected_output = Vector::from_vec(vec![
-            0.09003057,
-            0.24472848,
-            0.66524094,
-        ]);
+        let expected_output = Vector::from_vec(vec![0.09003057, 0.24472848, 0.66524094]);
 
         let output = softmax_activation(input);
 
@@ -58,11 +54,7 @@ mod tests {
     fn test_sigmoid_activation() {
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![1.0, 0.0, -1.0]).unwrap();
 
-        let expected_output = Vector::from(vec![
-            0.73105858,
-            0.5,
-            0.26894142,
-        ]);
+        let expected_output = Vector::from(vec![0.73105858, 0.5, 0.26894142]);
 
         let output = sigmoid_activation(input);
 
@@ -77,11 +69,7 @@ mod tests {
     fn test_relu_activation() {
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![-1.0, 0.0, 1.0]).unwrap();
 
-        let expected_output = Vector::from(vec![
-            0.0,
-            0.0,
-            1.0,
-        ]);
+        let expected_output = Vector::from(vec![0.0, 0.0, 1.0]);
 
         let output = relu_activation(input);
 
@@ -92,4 +80,3 @@ mod tests {
         }
     }
 }
-

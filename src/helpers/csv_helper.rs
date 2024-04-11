@@ -1,10 +1,9 @@
-
 // Helper code, might be used in the future
+use ndarray::Array2;
+use polars::prelude::*;
+use std::collections::HashMap;
 use std::fs::OpenOptions;
 use std::path::PathBuf;
-use polars::prelude::*;
-use ndarray::Array2;
-use std::collections::HashMap;
 
 pub fn dataframe_from_csv(file_path: PathBuf) -> PolarsResult<(DataFrame, DataFrame)> {
     let data = CsvReader::from_path(file_path)?.has_header(true).finish()?;

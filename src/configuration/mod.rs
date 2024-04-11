@@ -1,7 +1,7 @@
-pub mod config;
-pub mod layer;
 mod compile_config;
+pub mod config;
 mod inner_config;
-mod metric;
+pub mod layer;
 mod loss;
+mod metric;
 mod optimizer;

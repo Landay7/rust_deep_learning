@@ -1,13 +1,12 @@
-
-use crate::{NArray, Matrix, Vector};
+use crate::{Matrix, NArray, Vector};
 
 pub trait Layer {
     fn compute(&self, incoming: NArray) -> Result<NArray, ndarray::ShapeError>;
-    
+
     fn get_mut_weights(&mut self) -> &mut Matrix {
         panic!("this layer is not trainable")
     }
-    
+
     fn get_biases(&self) -> &Vector {
         panic!("this layer is not trainable")
     }
@@ -16,4 +15,3 @@ pub trait Layer {
         panic!("this layer is not trainable")
     }
 }
-

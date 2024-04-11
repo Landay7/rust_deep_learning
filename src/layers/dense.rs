@@ -1,28 +1,35 @@
-
-use crate::layers::layer_trait::Layer;
-use crate::{Vector, Matrix, NArray};
 use crate::layers::activation_layer::ActivationFunction;
+use crate::layers::layer_trait::Layer;
+use crate::{Matrix, NArray, Vector};
 
 pub struct Dense {
     weights: Matrix,
     bias: Vector,
-    activation: Option<ActivationFunction>
+    activation: Option<ActivationFunction>,
 }
 
 impl Dense {
-    pub fn new(weights: Matrix, bias: Vector, activation: Option<ActivationFunction>) -> Self{
+    pub fn new(weights: Matrix, bias: Vector, activation: Option<ActivationFunction>) -> Self {
         Self {
             weights,
             bias,
-            activation
+            activation,
         }
     }
 
-    pub fn from_hdf5(file: &hdf5::File, layer_name: &str, activation: Option<ActivationFunction>) -> Result<Self, hdf5::Error> {
+    pub fn from_hdf5(
+        file: &hdf5::File,
+        layer_name: &str,
+        activation: Option<ActivationFunction>,
+    ) -> Result<Self, hdf5::Error> {
         let base_path = format!(r"/layers\{}/vars", layer_name);
         dbg!(&base_path);
-        let weights: Matrix = file.dataset(format!("{}/0", base_path).as_str())?.read_2d()?;
-        let bias: Vector = file.dataset(format!("{}/1", base_path).as_str())?.read_1d()?;
+        let weights: Matrix = file
+            .dataset(format!("{}/0", base_path).as_str())?
+            .read_2d()?;
+        let bias: Vector = file
+            .dataset(format!("{}/1", base_path).as_str())?
+            .read_1d()?;
         Ok(Dense::new(weights, bias, activation))
     }
 }
@@ -53,7 +60,6 @@ impl Layer for Dense {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -73,7 +79,9 @@ mod tests {
 
     #[test]
     fn test_dense_compute_without_activation() {
-        let weights = Matrix::from_shape_vec((3, 3), vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]).unwrap();
+        let weights =
+            Matrix::from_shape_vec((3, 3), vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0])
+                .unwrap();
         let bias = Vector::from_vec(vec![1.0, 2.0, 3.0]);
         let dense_layer = Dense::new(weights, bias, None);
 
@@ -90,7 +98,11 @@ mod tests {
 
     #[test]
     fn test_dense_compute_with_activation() {
-        let weights =Matrix::from_shape_vec((3, 3), vec![1.0, -2.0, 3.0, -4.0, 5.0, -6.0, 7.0, -8.0, 9.0]).unwrap();
+        let weights = Matrix::from_shape_vec(
+            (3, 3),
+            vec![1.0, -2.0, 3.0, -4.0, 5.0, -6.0, 7.0, -8.0, 9.0],
+        )
+        .unwrap();
         let bias = Vector::from_vec(vec![1.0, -2.0, 3.0]);
         let activation = ActivationFunction::ReLu;
         let dense_layer = Dense::new(weights, bias, Some(activation));
@@ -105,6 +117,4 @@ mod tests {
             assert_approx_eq!(actual, expected, 1e-6);
         }
     }
-
-
 }

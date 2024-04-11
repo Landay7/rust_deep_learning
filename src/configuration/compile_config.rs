@@ -1,7 +1,7 @@
-use serde::{Deserialize, Serialize};
-use crate::configuration::metric::Metric;
 use crate::configuration::loss::Loss;
+use crate::configuration::metric::Metric;
 use crate::configuration::optimizer::Optimizer;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct CompileConfig {

@@ -1,6 +1,5 @@
-
-use serde::{Deserialize, Serialize};
 use crate::configuration::layer::Layer;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct InnerConfig {
@@ -15,9 +14,6 @@ impl InnerConfig {
 
     #[allow(dead_code)]
     pub fn new(name: String, layers: Vec<Layer>) -> Self {
-        InnerConfig {
-            name,
-            layers,
-        }
+        InnerConfig { name, layers }
     }
 }

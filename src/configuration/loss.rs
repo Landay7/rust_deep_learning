@@ -12,7 +12,12 @@ pub struct Loss {
 
 impl Loss {
     #[allow(dead_code)]
-    pub fn new(module: String, class_name: String, config: HashMap<String, Value>, registered_name: Option<String>) -> Self {
+    pub fn new(
+        module: String,
+        class_name: String,
+        config: HashMap<String, Value>,
+        registered_name: Option<String>,
+    ) -> Self {
         Loss {
             module,
             class_name,

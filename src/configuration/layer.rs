@@ -3,10 +3,10 @@ use serde_json::Value;
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub enum LayerType{
+pub enum LayerType {
     Dense,
     Flatten,
-    InputLayer
+    InputLayer,
 }
 
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
@@ -27,7 +27,13 @@ impl Layer {
         &self.config[property_name]
     }
 
-    pub fn new(module: String, class_name: LayerType, config: HashMap<String, Value>, registered_name: Option<String>, build_config: Option<HashMap<String, Value>>) -> Self {
+    pub fn new(
+        module: String,
+        class_name: LayerType,
+        config: HashMap<String, Value>,
+        registered_name: Option<String>,
+        build_config: Option<HashMap<String, Value>>,
+    ) -> Self {
         Layer {
             module,
             class_name,
