@@ -3,15 +3,15 @@ use crate::{Matrix, NArray, Vector};
 pub trait Layer {
     fn compute(&self, incoming: NArray) -> Result<NArray, ndarray::ShapeError>;
 
-    fn get_mut_weights(&mut self) -> &mut Matrix {
+    fn weights_mut(&mut self) -> &mut Matrix {
         panic!("this layer is not trainable")
     }
 
-    fn get_biases(&self) -> &Vector {
+    fn biases(&self) -> &Vector {
         panic!("this layer is not trainable")
     }
 
-    fn get_weights(&self) -> &Matrix {
+    fn weights(&self) -> &Matrix {
         panic!("this layer is not trainable")
     }
 }

@@ -47,15 +47,15 @@ impl Layer for Dense {
         }
     }
 
-    fn get_weights(&self) -> &Matrix {
+    fn weights(&self) -> &Matrix {
         &self.weights
     }
 
-    fn get_biases(&self) -> &Vector {
+    fn biases(&self) -> &Vector {
         &self.bias
     }
 
-    fn get_mut_weights(&mut self) -> &mut Matrix {
+    fn weights_mut(&mut self) -> &mut Matrix {
         &mut self.weights
     }
 }
