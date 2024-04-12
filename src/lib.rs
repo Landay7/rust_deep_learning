@@ -1,6 +1,5 @@
 pub mod activations;
 pub mod configuration;
-pub mod helpers;
 pub mod layers;
 pub mod model;
 
