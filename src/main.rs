@@ -1,7 +1,7 @@
 use ndarray::{Array1, Array4, Axis};
 use ndarray_npy::NpzReader;
 use rust_deep_learning::configuration::config::Config;
-use rust_deep_learning::model::sequantial::SequentialModel;
+use rust_deep_learning::model::sequential::SequentialModel;
 use rust_deep_learning::Vector;
 use std::fs::{self, File};
 use std::time::Instant;
@@ -66,7 +66,7 @@ fn main() -> Result<(), MainError> {
     }
     let elapsed = now.elapsed();
     println!("Elapsed: {:.2?}", elapsed);
-    println!("{}", correct / 128);
+    println!("{}", correct);
 
     Ok(())
 }
