@@ -28,11 +28,9 @@ pub fn relu(z: NArray) -> NArray {
     z.mapv(relu_scalar)
 }
 
-
-
 #[cfg(test)]
 mod tests {
-    use crate::{Vector, NArray};
+    use crate::{NArray, Vector};
 
     use assert_approx_eq::assert_approx_eq;
 

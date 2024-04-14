@@ -1,5 +1,4 @@
-use crate::layers::activation_layer::ActivationFunction;
-use crate::layers::Layer;
+use crate::layer::{ActivationFunction, Layer, NdResult};
 use crate::{Matrix, NArray, Vector};
 
 pub struct Dense {
@@ -30,12 +29,12 @@ impl Dense {
         let bias: Vector = file
             .dataset(format!("{}/1", base_path).as_str())?
             .read_1d()?;
-        Ok(Dense::new(weights, bias, activation))
+        Ok(Self::new(weights, bias, activation))
     }
 }
 
 impl Layer for Dense {
-    fn compute(&self, incoming: NArray) -> Result<NArray, ndarray::ShapeError> {
+    fn compute(&self, incoming: NArray) -> NdResult {
         let incoming_len = incoming.len();
         let arr_1d: Vector = incoming.into_shape(incoming_len)?;
         let computation_result = arr_1d.dot(&self.weights) + self.bias.clone();
@@ -63,7 +62,7 @@ impl Layer for Dense {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layers::activation_layer::ActivationFunction;
+    use crate::layer::ActivationFunction;
     use assert_approx_eq::assert_approx_eq;
 
     #[test]

@@ -1,7 +1,7 @@
 use crate::NArray;
 use crate::{
     activations::{relu, sigmoid, softmax},
-    layers::Layer,
+    layer::{Layer, NdResult},
 };
 use serde::Deserialize;
 
@@ -41,7 +41,7 @@ impl Activation {
 }
 
 impl Layer for Activation {
-    fn compute(&self, incoming: NArray) -> Result<NArray, ndarray::ShapeError> {
+    fn compute(&self, incoming: NArray) -> NdResult {
         Ok(self.activation_function.compute(incoming))
     }
 }

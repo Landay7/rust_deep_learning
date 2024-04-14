@@ -1641,6 +1641,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tempfile",
+ "thiserror",
  "zip 0.6.6",
 ]
 

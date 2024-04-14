@@ -1,6 +1,6 @@
 pub mod activations;
 pub mod configuration;
-pub mod layers;
+pub mod layer;
 pub mod model;
 
 pub type Vector = ndarray::Array1<f32>;

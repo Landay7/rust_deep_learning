@@ -1,6 +1,3 @@
-use crate::configuration::compile_config::CompileConfig;
-use crate::configuration::inner_config::InnerConfig;
-use crate::configuration::layer::Layer;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
@@ -21,13 +18,161 @@ impl Config {
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct CompileConfig {
+    optimizer: Optimizer,
+    loss: Loss,
+    metrics: Vec<Metric>,
+}
+
+impl CompileConfig {
+    #[allow(dead_code)]
+    pub fn new(optimizer: Optimizer, loss: Loss, metrics: Vec<Metric>) -> Self {
+        CompileConfig {
+            optimizer,
+            loss,
+            metrics,
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct InnerConfig {
+    name: String,
+    layers: Vec<Layer>,
+}
+
+impl InnerConfig {
+    pub fn get_layers(&self) -> &Vec<Layer> {
+        &self.layers
+    }
+
+    #[allow(dead_code)]
+    pub fn new(name: String, layers: Vec<Layer>) -> Self {
+        InnerConfig { name, layers }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub enum LayerType {
+    Dense,
+    Flatten,
+    InputLayer,
+}
+
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct Layer {
+    module: String,
+    class_name: LayerType,
+    config: HashMap<String, Value>,
+    registered_name: Option<String>,
+    build_config: Option<HashMap<String, Value>>,
+}
+
+impl Layer {
+    pub fn get_class_name(&self) -> &LayerType {
+        &self.class_name
+    }
+
+    pub fn get_property(&self, property_name: &str) -> &Value {
+        &self.config[property_name]
+    }
+
+    pub fn new(
+        module: String,
+        class_name: LayerType,
+        config: HashMap<String, Value>,
+        registered_name: Option<String>,
+        build_config: Option<HashMap<String, Value>>,
+    ) -> Self {
+        Layer {
+            module,
+            class_name,
+            config,
+            registered_name,
+            build_config,
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct Loss {
+    module: String,
+    class_name: String,
+    config: HashMap<String, Value>,
+    registered_name: Option<String>,
+}
+
+impl Loss {
+    #[allow(dead_code)]
+    pub fn new(
+        module: String,
+        class_name: String,
+        config: HashMap<String, Value>,
+        registered_name: Option<String>,
+    ) -> Self {
+        Loss {
+            module,
+            class_name,
+            config,
+            registered_name,
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct Metric {
+    module: String,
+    class_name: String,
+    config: HashMap<String, Value>,
+    registered_name: Option<String>,
+}
+
+impl Metric {
+    #[allow(dead_code)]
+    pub fn new(
+        module: String,
+        class_name: String,
+        config: HashMap<String, Value>,
+        registered_name: Option<String>,
+    ) -> Self {
+        Metric {
+            module,
+            class_name,
+            config,
+            registered_name,
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct Optimizer {
+    module: String,
+    class_name: String,
+    config: HashMap<String, Value>,
+    registered_name: Option<String>,
+}
+
+impl Optimizer {
+    #[allow(dead_code)]
+    pub fn new(
+        module: String,
+        class_name: String,
+        config: HashMap<String, Value>,
+        registered_name: Option<String>,
+    ) -> Self {
+        Optimizer {
+            module,
+            class_name,
+            config,
+            registered_name,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::configuration::layer::LayerType;
-    use crate::configuration::loss::Loss;
-    use crate::configuration::metric::Metric;
-    use crate::configuration::optimizer::Optimizer;
     use serde_json;
 
     #[test]
