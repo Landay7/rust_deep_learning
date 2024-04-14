@@ -1,6 +1,6 @@
 use crate::NArray;
 use crate::{
-    activations::{relu_activation, sigmoid_activation, softmax_activation},
+    activations::{relu, sigmoid, softmax},
     layers::Layer,
 };
 use serde::Deserialize;
@@ -20,9 +20,9 @@ pub enum ActivationFunction {
 impl ActivationFunction {
     pub fn compute(&self, incoming: NArray) -> NArray {
         match self {
-            Self::ReLu => relu_activation(incoming),
-            Self::Sigmoid => sigmoid_activation(incoming),
-            Self::SoftMax => softmax_activation(incoming),
+            Self::ReLu => relu(incoming),
+            Self::Sigmoid => sigmoid(incoming),
+            Self::SoftMax => softmax(incoming),
             Self::Linear => incoming,
         }
     }
