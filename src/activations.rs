@@ -37,7 +37,7 @@ mod tests {
     use assert_approx_eq::assert_approx_eq;
 
     #[test]
-    fn softmax_activation() {
+    fn softmax() {
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![1.0, 2.0, 3.0]).unwrap();
 
         let expected_output = Vector::from_vec(vec![0.09003057, 0.24472848, 0.66524094]);
@@ -52,7 +52,7 @@ mod tests {
     }
 
     #[test]
-    fn sigmoid_activation() {
+    fn sigmoid() {
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![1.0, 0.0, -1.0]).unwrap();
 
         let expected_output = Vector::from(vec![0.73105858, 0.5, 0.26894142]);
@@ -67,7 +67,7 @@ mod tests {
     }
 
     #[test]
-    fn relu_activation() {
+    fn relu() {
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![-1.0, 0.0, 1.0]).unwrap();
 
         let expected_output = Vector::from(vec![0.0, 0.0, 1.0]);

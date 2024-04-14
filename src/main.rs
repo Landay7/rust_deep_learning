@@ -2,9 +2,9 @@ use ndarray::{Array1, Array4, Axis};
 use ndarray_npy::NpzReader;
 use rust_deep_learning::configuration::config::Config;
 use rust_deep_learning::model::sequential::SequentialModel;
-use rust_deep_learning::Vector;
 use std::fs::{self, File};
 use std::time::Instant;
+use itertools::Itertools;
 
 #[derive(Debug)]
 enum MainError {
@@ -39,10 +39,9 @@ fn main() -> Result<(), MainError> {
         .by_name("y.npy")
         .map_err(MainError::NpzMissingFileError)?;
 
-    let mut index: usize = 0;
     let mut correct = 0;
     let now = Instant::now();
-    for case in x.axis_iter(Axis(0)) {
+    for (index, case) in x.axis_iter(Axis(0)).enumerate() {
         // 'case' is now a view of a 3D array representing one case
         let result_arr = model.compute(case.to_owned().into_dyn()).map_err(|err| {
             MainError::ModelComputeError(format!("Layer computation error: {:?}", err))
@@ -56,31 +55,16 @@ fn main() -> Result<(), MainError> {
         })?;
 
         // Find the index of the maximum element (argmax)
-        let argmax_index = argmax(&array1).ok_or(MainError::ArrayTransformError(
+        let argmax_index = array1.iter().position_max_by(|x, y| x.total_cmp(y)).ok_or(MainError::ArrayTransformError(
             "Failed to find argmax index".to_string(),
         ))?;
         if argmax_index as i64 == y[index] {
             correct += 1;
         }
-        index += 1;
     }
     let elapsed = now.elapsed();
     println!("Elapsed: {:.2?}", elapsed);
     println!("{}", correct);
 
     Ok(())
-}
-
-fn argmax(array: &Vector) -> Option<usize> {
-    let mut max_index = None;
-    let mut max_value = std::f32::NEG_INFINITY;
-
-    for (index, &value) in array.indexed_iter() {
-        if value > max_value {
-            max_value = value;
-            max_index = Some(index);
-        }
-    }
-
-    max_index
 }

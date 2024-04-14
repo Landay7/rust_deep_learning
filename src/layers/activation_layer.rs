@@ -53,7 +53,7 @@ mod tests {
     use assert_approx_eq::assert_approx_eq;
 
     #[test]
-    fn test_relu_activation() {
+    fn relu_activation() {
         let relu_activation = Activation::new(ActivationFunction::ReLu);
 
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![-1.0, 0.0, 1.0]).unwrap();
@@ -66,7 +66,7 @@ mod tests {
     }
 
     #[test]
-    fn test_sigmoid_activation() {
+    fn sigmoid_activation() {
         let sigmoid_activation = Activation::new(ActivationFunction::Sigmoid);
 
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![0.0, 1.0, -1.0]).unwrap();
@@ -80,7 +80,7 @@ mod tests {
     }
 
     #[test]
-    fn test_softmax_activation() {
+    fn softmax_activation() {
         let softmax_activation = Activation::new(ActivationFunction::SoftMax);
 
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![1.0, 2.0, 3.0]).unwrap();
@@ -94,7 +94,7 @@ mod tests {
     }
 
     #[test]
-    fn test_linear_activation() {
+    fn linear_activation() {
         let linear_activation = Activation::new(ActivationFunction::Linear);
 
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![1.0, 2.0, 3.0]).unwrap();
