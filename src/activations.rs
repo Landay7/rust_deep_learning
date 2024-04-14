@@ -30,18 +30,17 @@ fn relu(x: f32) -> f32 {
 
 #[cfg(test)]
 mod tests {
-    use crate::Vector;
+    use crate::{Vector, NArray};
 
-    use super::*;
     use assert_approx_eq::assert_approx_eq;
 
     #[test]
-    fn test_softmax_activation() {
+    fn softmax_activation() {
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![1.0, 2.0, 3.0]).unwrap();
 
         let expected_output = Vector::from_vec(vec![0.09003057, 0.24472848, 0.66524094]);
 
-        let output = softmax_activation(input);
+        let output = super::softmax_activation(input);
 
         let output_vector = Vector::from_vec(output.as_slice().unwrap().to_vec());
 
@@ -51,12 +50,12 @@ mod tests {
     }
 
     #[test]
-    fn test_sigmoid_activation() {
+    fn sigmoid_activation() {
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![1.0, 0.0, -1.0]).unwrap();
 
         let expected_output = Vector::from(vec![0.73105858, 0.5, 0.26894142]);
 
-        let output = sigmoid_activation(input);
+        let output = super::sigmoid_activation(input);
 
         let output_vector = Vector::from_vec(output.as_slice().unwrap().to_vec());
 
@@ -66,12 +65,12 @@ mod tests {
     }
 
     #[test]
-    fn test_relu_activation() {
+    fn relu_activation() {
         let input = NArray::from_shape_vec(ndarray::IxDyn(&[3]), vec![-1.0, 0.0, 1.0]).unwrap();
 
         let expected_output = Vector::from(vec![0.0, 0.0, 1.0]);
 
-        let output = relu_activation(input);
+        let output = super::relu_activation(input);
 
         let output_vector = Vector::from_vec(output.as_slice().unwrap().to_vec());
 

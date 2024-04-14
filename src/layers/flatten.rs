@@ -1,4 +1,4 @@
-use crate::layers::layer_trait::Layer;
+use crate::layers::Layer;
 use crate::{NArray, Vector};
 
 pub struct Flatten;

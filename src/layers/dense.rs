@@ -1,5 +1,5 @@
 use crate::layers::activation_layer::ActivationFunction;
-use crate::layers::layer_trait::Layer;
+use crate::layers::Layer;
 use crate::{Matrix, NArray, Vector};
 
 pub struct Dense {
@@ -22,7 +22,7 @@ impl Dense {
         layer_name: &str,
         activation: Option<ActivationFunction>,
     ) -> Result<Self, hdf5::Error> {
-        let base_path = format!(r"/layers\{}/vars", layer_name);
+        let base_path = format!(r"/layers\{layer_name}/vars");
         dbg!(&base_path);
         let weights: Matrix = file
             .dataset(format!("{}/0", base_path).as_str())?

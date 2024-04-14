@@ -1,7 +1,7 @@
 use crate::configuration::{config::Config, layer::LayerType};
 use crate::layers::dense::Dense;
 use crate::layers::flatten::Flatten;
-use crate::layers::layer_trait::Layer;
+use crate::layers::Layer;
 use crate::NArray;
 
 pub struct SequentialModel {
